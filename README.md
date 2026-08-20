@@ -28,12 +28,12 @@ The frontend UI was designed in Google Stitch ("mission control" glassmorphism t
 ## Screenshots
 
 
-![Demo_1](docs/screenshots/Screenshot210.png)
-![Demo_2](docs/screenshots/Screenshot211.png)
-![Demo_3](docs/screenshots/Screenshot212.png)
-![Demo_4](docs/screenshots/Screenshot213.png)
-![Demo_5](docs/screenshots/Screenshot214.png)
-![Demo_6](docs/screenshots/Screenshot215.png)
+![Demo_1](docs/screenshots/Screenshot (210).png)
+![Demo_2](docs/screenshots/Screenshot (211).png)
+![Demo_3](docs/screenshots/Screenshot (212).png)
+![Demo_4](docs/screenshots/Screenshot (213).png)
+![Demo_5](docs/screenshots/Screenshot (214).png)
+![Demo_6](docs/screenshots/Screenshot (215).png)
 
 
 ## Project structure
