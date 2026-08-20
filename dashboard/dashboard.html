@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dashboard - Seismic Pulse</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ffd79b",
+                        "on-primary-fixed": "#281900",
+                        "on-primary-fixed-variant": "#604100",
+                        "secondary-container": "#a00118",
+                        "inverse-primary": "#7e5700",
+                        "surface-dim": "#131313",
+                        "tertiary-container": "#00d5ed",
+                        "on-secondary-fixed-variant": "#930015",
+                        "outline": "#9e8e78",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-error": "#690005",
+                        "error": "#ffb4ab",
+                        "background": "#131313",
+                        "primary-container": "#ffb300",
+                        "surface-bright": "#393939",
+                        "on-tertiary-fixed-variant": "#004f58",
+                        "surface": "#131313",
+                        "on-surface": "#e5e2e1",
+                        "secondary-fixed-dim": "#ffb3ae",
+                        "on-tertiary-fixed": "#001f24",
+                        "inverse-surface": "#e5e2e1",
+                        "surface-tint": "#ffba38",
+                        "tertiary": "#85edff",
+                        "on-tertiary-container": "#005863",
+                        "surface-variant": "#353534",
+                        "surface-container-high": "#2a2a2a",
+                        "tertiary-fixed": "#9cf0ff",
+                        "surface-container-highest": "#353534",
+                        "error-container": "#93000a",
+                        "on-secondary": "#68000c",
+                        "surface-container": "#201f1f",
+                        "tertiary-fixed-dim": "#00daf3",
+                        "on-surface-variant": "#d6c4ac",
+                        "on-error-container": "#ffdad6",
+                        "secondary-fixed": "#ffdad7",
+                        "on-primary-container": "#6b4900",
+                        "on-background": "#e5e2e1",
+                        "secondary": "#ffb3ae",
+                        "outline-variant": "#514532",
+                        "on-tertiary": "#00363d",
+                        "surface-container-low": "#1c1b1b",
+                        "on-secondary-container": "#ffa8a3",
+                        "primary-fixed-dim": "#ffba38",
+                        "primary-fixed": "#ffdeac",
+                        "on-primary": "#432c00",
+                        "on-secondary-fixed": "#410004",
+                        "inverse-on-surface": "#313030"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    spacing: {
+                        "container-max-width": "1600px",
+                        "margin": "24px",
+                        "unit": "4px",
+                        "card-padding": "20px",
+                        "gutter": "16px"
+                    },
+                    fontFamily: {
+                        "headline-lg": ["Hanken Grotesk"],
+                        "data-md": ["JetBrains Mono"],
+                        "body-lg": ["Hanken Grotesk"],
+                        "data-lg": ["JetBrains Mono"],
+                        "body-md": ["Hanken Grotesk"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "label-sm": ["JetBrains Mono"]
+                    },
+                    fontSize: {
+                        "headline-lg": ["36px", { lineHeight: "44px", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "data-md": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+                        "body-lg": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+                        "data-lg": ["20px", { lineHeight: "28px", fontWeight: "500" }],
+                        "body-md": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+                        "headline-md": ["24px", { lineHeight: "32px", fontWeight: "600" }],
+                        "label-sm": ["11px", { lineHeight: "16px", letterSpacing: "0.08em", fontWeight: "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .glass-panel {
+            background-color: rgba(30, 30, 30, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 179, 0, 0.15);
+        }
+        .pulse-alert {
+            box-shadow: inset 0 0 10px rgba(255, 82, 82, 0.2);
+            border-left: 4px solid #ffb4ab;
+        }
+        .pulse-warning {
+            border-left: 4px solid #ffb300;
+        }
+        .pulse-normal {
+            border-left: 4px solid #a3a3a3;
+        }
+        .chart-container {
+            position: relative;
+            height: 100%;
+            width: 100%;
+            min-height: 250px;
+        }
+        /* Custom Scrollbar for dark theme */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #131313; }
+        ::-webkit-scrollbar-thumb { background: #353534; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #514532; }
+    </style>
+<!-- Chart.js for data visualization -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-background text-on-surface font-body-md min-h-screen flex flex-col pt-16">
+<!-- TopNavBar -->
+<nav class="fixed top-0 left-0 w-full z-50 bg-surface/70 backdrop-blur-md border-b border-outline-variant">
+<div class="flex justify-between items-center h-16 px-margin max-w-container-max-width mx-auto">
+<div class="flex items-center gap-8">
+<a class="font-headline-md text-headline-md font-bold text-primary dark:text-primary tracking-tight flex items-center gap-2" href="index.html">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">sensors</span>
+                    Seismic Pulse
+                </a>
+<div class="hidden md:flex gap-6">
+<a class="text-primary font-bold border-b-2 border-primary pb-1 font-body-md text-body-md hover:text-primary transition-colors duration-200" href="dashboard.html">Dashboard</a>
+<a class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors duration-200" href="index.html">Landing Page</a>
+</div>
+</div>
+<div class="flex items-center gap-4 text-primary dark:text-primary-fixed-dim">
+<button class="hover:text-primary transition-colors duration-200 opacity-80 hover:opacity-100 flex items-center">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<button class="hover:text-primary transition-colors duration-200 opacity-80 hover:opacity-100 flex items-center">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</div>
+</nav>
+<main class="flex-grow w-full max-w-container-max-width mx-auto px-margin py-margin flex flex-col gap-margin">
+<!-- Section 1: Hero/Overview -->
+<section class="glass-panel rounded-xl flex flex-col border-t border-t-primary/30 relative overflow-hidden">
+<canvas class="absolute inset-0 w-full h-full z-0 opacity-40 pointer-events-none" id="hero-shader"></canvas>
+<div class="relative z-10 flex flex-col gap-gutter p-card-padding">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-outline-variant/30 pb-4">
+<div>
+<h2 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-2">Strongest Recent Event</h2>
+<div class="flex items-baseline gap-4">
+<span class="font-headline-lg text-headline-lg text-error">Mag <span id="strongest">--</span></span>
+<span class="font-body-lg text-body-lg text-on-surface flex items-center gap-1">
+<span class="material-symbols-outlined text-outline">location_on</span>
+                            <span id="hero-place">Loading...</span>
+                        </span>
+</div>
+</div>
+<div class="text-right">
+<span class="font-data-md text-data-md text-on-surface-variant">Last Update: <span class="text-primary" id="last-updated-time">--</span></span>
+</div>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-gutter pt-2">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Total Events</span>
+<span class="font-data-lg text-data-lg text-primary" id="total-quakes">--</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Avg Magnitude</span>
+<span class="font-data-lg text-data-lg text-primary" id="avg-magnitude">--</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Active Tsunami Flags</span>
+<span class="font-data-lg text-data-lg text-error flex items-center gap-2">
+                        <span id="tsunami-count">--</span> <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">warning</span>
+</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Data Source</span>
+<span class="font-data-lg text-data-lg text-tertiary">USGS LIVE</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: Analysis Bento Grid -->
+<section class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Large Line Chart: Events over Time -->
+<div class="glass-panel rounded-xl p-card-padding md:col-span-8 flex flex-col">
+<div class="flex justify-between items-center mb-4">
+<h3 class="font-body-md text-body-md font-semibold text-on-surface">Seismic Activity Over Time</h3>
+<span class="material-symbols-outlined text-outline-variant text-sm">show_chart</span>
+</div>
+<div class="chart-container flex-grow h-[300px]">
+<canvas id="timelineChart"></canvas>
+</div>
+</div>
+<!-- Donut Chart: Alert Levels -->
+<div class="glass-panel rounded-xl p-card-padding md:col-span-4 flex flex-col">
+<div class="flex justify-between items-center mb-4">
+<h3 class="font-body-md text-body-md font-semibold text-on-surface">Alert Distribution</h3>
+<span class="material-symbols-outlined text-outline-variant text-sm">pie_chart</span>
+</div>
+<div class="chart-container flex-grow h-[250px]">
+<canvas id="alertDonutChart"></canvas>
+</div>
+</div>
+<!-- Scatter Plot: Depth vs Mag -->
+<div class="glass-panel rounded-xl p-card-padding md:col-span-6 flex flex-col">
+<div class="flex justify-between items-center mb-4">
+<h3 class="font-body-md text-body-md font-semibold text-on-surface">Depth vs Magnitude</h3>
+<span class="material-symbols-outlined text-outline-variant text-sm">scatter_plot</span>
+</div>
+<div class="chart-container flex-grow h-[250px]">
+<canvas id="depthScatterChart"></canvas>
+</div>
+</div>
+<!-- Horizontal Bar: Leaderboard -->
+<div class="glass-panel rounded-xl p-card-padding md:col-span-6 flex flex-col">
+<div class="flex justify-between items-center mb-4">
+<h3 class="font-body-md text-body-md font-semibold text-on-surface">Top 5 Strongest Events</h3>
+<span class="material-symbols-outlined text-outline-variant text-sm">bar_chart</span>
+</div>
+<div class="chart-container flex-grow h-[250px]">
+<canvas id="regionBarChart"></canvas>
+</div>
+</div>
+</section>
+<!-- Section 3: Incident Log -->
+<section class="glass-panel rounded-xl flex flex-col flex-grow">
+<div class="p-card-padding border-b border-outline-variant/30 flex justify-between items-center flex-wrap gap-4">
+<h3 class="font-headline-md text-headline-md text-primary">Incident Log</h3>
+<div class="flex items-center gap-4">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline-variant text-sm">search</span>
+<input class="bg-surface-container-high border-b border-outline-variant focus:border-primary text-on-surface font-data-md text-data-md py-1 pl-9 pr-3 outline-none transition-colors w-48 focus:w-64" id="filter-search" oninput="filterEarthquakes()" placeholder="Search region..." type="text"/>
+</div>
+<button class="bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30 px-4 py-1.5 rounded-DEFAULT font-label-sm text-label-sm uppercase tracking-wider flex items-center gap-2 transition-colors" onclick="downloadCSV()">
+<span class="material-symbols-outlined text-[16px]">download</span> Export CSV
+                    </button>
+</div>
+</div>
+<div class="flex flex-col max-h-[500px] overflow-y-auto p-4 gap-2" id="log-list">
+<p class="font-data-md text-data-md text-on-surface-variant p-3">Loading incident log...</p>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest dark:bg-surface-container-lowest w-full py-8 mt-auto border-t border-outline-variant/30 transition-opacity duration-200">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin max-w-container-max-width mx-auto gap-4">
+<div class="font-label-sm text-label-sm font-bold text-primary">
+                © 2024 Seismic Pulse. Data sourced from USGS.
+            </div>
+<div class="flex gap-4">
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary underline transition-all" href="#">API Documentation</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary underline transition-all" href="#">Privacy Policy</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary underline transition-all" href="#">Emergency Protocols</a>
+</div>
+</div>
+</footer>
+<!-- Chart Configuration Script -->
+<script>
+        // Shared Chart.js options for dark theme
+        Chart.defaults.color = '#9e8e78';
+        Chart.defaults.font.family = "'JetBrains Mono', monospace";
+        const gridColor = 'rgba(255,255,255,0.05)';
+        const tooltipBg = 'rgba(30, 30, 30, 0.9)';
+
+        // 1. Timeline Chart (Line)
+        const ctxTime = document.getElementById('timelineChart').getContext('2d');
+        new Chart(ctxTime, {
+            type: 'line',
+            data: {
+                labels: ['-48h', '-42h', '-36h', '-30h', '-24h', '-18h', '-12h', '-6h', 'Now'],
+                datasets: [{
+                    label: 'Event Frequency',
+                    data: [12, 19, 15, 25, 22, 30, 45, 38, 55],
+                    borderColor: '#ffd79b',
+                    backgroundColor: 'rgba(255, 215, 155, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#131313',
+                    pointBorderColor: '#ffd79b'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { color: gridColor, drawBorder: false } },
+                    y: { grid: { color: gridColor, drawBorder: false }, beginAtZero: true }
+                }
+            }
+        });
+
+        // 2. Alert Donut
+        const ctxDonut = document.getElementById('alertDonutChart').getContext('2d');
+        new Chart(ctxDonut, {
+            type: 'doughnut',
+            data: {
+                labels: ['Green (M<3)', 'Yellow (M3-5)', 'Red (M>5)'],
+                datasets: [{
+                    data: [110, 25, 7],
+                    backgroundColor: ['#514532', '#ffb300', '#ffb4ab'],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: '#e5e2e1', font: { size: 11 } } }
+                }
+            }
+        });
+
+        // 3. Scatter Plot (Depth vs Mag)
+        const ctxScatter = document.getElementById('depthScatterChart').getContext('2d');
+        new Chart(ctxScatter, {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    label: 'Events',
+                    data: [
+                        {x: 2.1, y: 5}, {x: 4.5, y: 15}, {x: 7.2, y: 32}, {x: 3.1, y: 10}, 
+                        {x: 1.8, y: 8}, {x: 5.5, y: 45}, {x: 2.8, y: 12}
+                    ],
+                    backgroundColor: '#85edff',
+                    borderColor: 'transparent'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { title: { display: true, text: 'Magnitude', color: '#9e8e78' }, grid: { color: gridColor } },
+                    y: { title: { display: true, text: 'Depth (km)', color: '#9e8e78' }, grid: { color: gridColor }, reverse: true }
+                }
+            }
+        });
+
+        // 4. Horizontal Bar
+        const ctxBar = document.getElementById('regionBarChart').getContext('2d');
+        new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: ['Japan', 'Chile', 'California', 'Italy', 'Alaska'],
+                datasets: [{
+                    label: 'Max Magnitude',
+                    data: [7.2, 4.5, 2.1, 1.8, 3.5],
+                    backgroundColor: ['#ffb4ab', '#ffb300', '#514532', '#514532', '#ffb300'],
+                    borderRadius: 2
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { color: gridColor }, beginAtZero: true },
+                    y: { grid: { display: false } }
+                }
+            }
+        });
+    </script>
+<script>
+    (function() {
+        const canvas = document.getElementById('hero-shader');
+        if (!canvas) return;
+        const gl = canvas.getContext('webgl');
+        if (!gl) return;
+
+        const vertexShaderSource = `
+            attribute vec2 a_position;
+            varying vec2 v_texCoord;
+            void main() {
+                gl_Position = vec4(a_position, 0.0, 1.0);
+                v_texCoord = a_position * 0.5 + 0.5;
+            }
+        `;
+
+        const fragmentShaderSource = `
+precision highp float;
+
+varying vec2 v_texCoord;
+uniform float u_time;
+uniform vec2 u_resolution;
+
+void main() {
+    vec2 uv = v_texCoord;
+    
+    // Scale and center the coordinates for the seismograph line
+    float x = uv.x * 10.0;
+    
+    // Create multiple sine waves with different frequencies and speeds for a "seismic" feel
+    float wave = 0.0;
+    wave += sin(x * 1.5 + u_time * 2.0) * 0.2;
+    wave += sin(x * 3.7 - u_time * 3.5) * 0.1;
+    wave += sin(x * 8.2 + u_time * 5.0) * 0.05;
+    
+    // Add "spikes" to simulate earthquake pulses
+    float pulse = sin(u_time * 0.5) * 0.5 + 0.5;
+    wave *= 1.0 + (pulse * 2.0 * sin(x * 20.0 + u_time * 10.0));
+    
+    // Vertical centering
+    float linePos = 0.5 + wave * 0.3;
+    
+    // Line thickness and glow
+    float dist = abs(uv.y - linePos);
+    float thickness = 0.005;
+    float glow = 0.04;
+    
+    // Color: Amber energy (#FFB300)
+    vec3 color = vec3(1.0, 0.7, 0.0);
+    
+    // Calculate intensity based on distance from the center line
+    float intensity = exp(-dist / thickness) * 1.2;
+    intensity += exp(-dist / glow) * 0.4;
+    
+    // Add horizontal fade at edges
+    float edgeFade = smoothstep(0.0, 0.1, uv.x) * smoothstep(1.0, 0.9, uv.x);
+    intensity *= edgeFade;
+    
+    // Background: Dark charcoal with a faint grid
+    vec3 backgroundColor = vec3(0.07, 0.07, 0.07);
+    float grid = (sin(uv.x * 100.0) > 0.98 || sin(uv.y * 100.0) > 0.98) ? 0.03 : 0.0;
+    backgroundColor += grid;
+    
+    gl_FragColor = vec4(mix(backgroundColor, color, intensity), 1.0);
+}
+`;
+
+        function createShader(gl, type, source) {
+            const shader = gl.createShader(type);
+            gl.shaderSource(shader, source);
+            gl.compileShader(shader);
+            if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                console.error(gl.getShaderInfoLog(shader));
+                gl.deleteShader(shader);
+                return null;
+            }
+            return shader;
+        }
+
+        const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
+        const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
+
+        const program = gl.createProgram();
+        gl.attachShader(program, vertexShader);
+        gl.attachShader(program, fragmentShader);
+        gl.linkProgram(program);
+
+        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+            console.error(gl.getProgramInfoLog(program));
+            return;
+        }
+
+        const positionAttributeLocation = gl.getAttribLocation(program, "a_position");
+        const positionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+        const positions = [
+            -1, -1,
+             1, -1,
+            -1,  1,
+            -1,  1,
+             1, -1,
+             1,  1,
+        ];
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+
+        const timeUniformLocation = gl.getUniformLocation(program, "u_time");
+        const resolutionUniformLocation = gl.getUniformLocation(program, "u_resolution");
+
+        function resizeCanvasToDisplaySize(canvas) {
+            const rect = canvas.getBoundingClientRect();
+            if (canvas.width !== rect.width || canvas.height !== rect.height) {
+                canvas.width = rect.width;
+                canvas.height = rect.height;
+                return true;
+            }
+            return false;
+        }
+
+        let startTime = performance.now();
+
+        function render(time) {
+            resizeCanvasToDisplaySize(canvas);
+            gl.viewport(0, 0, canvas.width, canvas.height);
+            
+            gl.useProgram(program);
+            gl.enableVertexAttribArray(positionAttributeLocation);
+            gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+            gl.vertexAttribPointer(positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
+
+            gl.uniform1f(timeUniformLocation, (time - startTime) * 0.001);
+            gl.uniform2f(resolutionUniformLocation, canvas.width, canvas.height);
+
+            gl.drawArrays(gl.TRIANGLES, 0, 6);
+            requestAnimationFrame(render);
+        }
+        
+        requestAnimationFrame(render);
+    })();
+</script>
+<script src="script.js"></script>
+</body></html>

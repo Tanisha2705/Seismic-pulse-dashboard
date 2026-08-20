@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Seismic Pulse - Earthquake Intelligence Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary": "#ffd79b",
+                      "on-primary-fixed": "#281900",
+                      "on-primary-fixed-variant": "#604100",
+                      "secondary-container": "#a00118",
+                      "inverse-primary": "#7e5700",
+                      "surface-dim": "#131313",
+                      "tertiary-container": "#00d5ed",
+                      "on-secondary-fixed-variant": "#930015",
+                      "outline": "#9e8e78",
+                      "surface-container-lowest": "#0e0e0e",
+                      "on-error": "#690005",
+                      "error": "#ffb4ab",
+                      "background": "#131313",
+                      "primary-container": "#ffb300",
+                      "surface-bright": "#393939",
+                      "on-tertiary-fixed-variant": "#004f58",
+                      "surface": "#131313",
+                      "on-surface": "#e5e2e1",
+                      "secondary-fixed-dim": "#ffb3ae",
+                      "on-tertiary-fixed": "#001f24",
+                      "inverse-surface": "#e5e2e1",
+                      "surface-tint": "#ffba38",
+                      "tertiary": "#85edff",
+                      "on-tertiary-container": "#005863",
+                      "surface-variant": "#353534",
+                      "surface-container-high": "#2a2a2a",
+                      "tertiary-fixed": "#9cf0ff",
+                      "surface-container-highest": "#353534",
+                      "error-container": "#93000a",
+                      "on-secondary": "#68000c",
+                      "surface-container": "#201f1f",
+                      "tertiary-fixed-dim": "#00daf3",
+                      "on-surface-variant": "#d6c4ac",
+                      "on-error-container": "#ffdad6",
+                      "secondary-fixed": "#ffdad7",
+                      "on-primary-container": "#6b4900",
+                      "on-background": "#e5e2e1",
+                      "secondary": "#ffb3ae",
+                      "outline-variant": "#514532",
+                      "on-tertiary": "#00363d",
+                      "surface-container-low": "#1c1b1b",
+                      "on-secondary-container": "#ffa8a3",
+                      "primary-fixed-dim": "#ffba38",
+                      "primary-fixed": "#ffdeac",
+                      "on-primary": "#432c00",
+                      "on-secondary-fixed": "#410004",
+                      "inverse-on-surface": "#313030"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "container-max-width": "1600px",
+                      "margin": "24px",
+                      "unit": "4px",
+                      "card-padding": "20px",
+                      "gutter": "16px"
+              },
+              "fontFamily": {
+                      "headline-lg": [
+                              "Hanken Grotesk"
+                      ],
+                      "data-md": [
+                              "JetBrains Mono"
+                      ],
+                      "body-lg": [
+                              "Hanken Grotesk"
+                      ],
+                      "data-lg": [
+                              "JetBrains Mono"
+                      ],
+                      "body-md": [
+                              "Hanken Grotesk"
+                      ],
+                      "headline-md": [
+                              "Hanken Grotesk"
+                      ],
+                      "label-sm": [
+                              "JetBrains Mono"
+                      ]
+              },
+              "fontSize": {
+                      "headline-lg": [
+                              "36px",
+                              {
+                                      "lineHeight": "44px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "data-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "data-lg": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-sm": [
+                              "11px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.08em",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+          .glass-panel {
+              background: rgba(30, 30, 30, 0.7);
+              backdrop-filter: blur(12px);
+              -webkit-backdrop-filter: blur(12px);
+              border: 1px solid rgba(255, 179, 0, 0.15);
+          }
+          .seismic-grid-bg {
+              background-image: 
+                  linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+                  linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+              background-size: 40px 40px;
+          }
+          
+          /* Simulate a subtle animated pulse effect in the background */
+          @keyframes pulse-glow {
+              0% { box-shadow: 0 0 0 0 rgba(255, 179, 0, 0.1); }
+              70% { box-shadow: 0 0 0 20px rgba(255, 179, 0, 0); }
+              100% { box-shadow: 0 0 0 0 rgba(255, 179, 0, 0); }
+          }
+          
+          .glow-effect {
+              position: relative;
+          }
+          .glow-effect::before {
+              content: '';
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              width: 150%;
+              height: 150%;
+              background: radial-gradient(circle, rgba(255,179,0,0.15) 0%, transparent 70%);
+              z-index: -1;
+              pointer-events: none;
+          }
+      </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen flex flex-col font-body-md text-body-md overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar -->
+<header class="fixed top-0 left-0 w-full z-50 bg-surface/70 backdrop-blur-md border-b border-outline-variant">
+<div class="flex justify-between items-center h-16 px-margin max-w-container-max-width mx-auto">
+<a class="font-headline-md text-headline-md font-bold text-primary flex items-center gap-2" href="index.html">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">sensors</span>
+                Seismic Pulse
+            </a>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors duration-200" href="dashboard.html">Dashboard</a>
+<a class="text-primary font-bold border-b-2 border-primary pb-1 opacity-80 transition-all duration-150" href="index.html">Landing Page</a>
+</nav>
+<div class="flex items-center gap-4 text-primary">
+<button aria-label="Settings" class="hover:text-primary-container transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button aria-label="Account" class="hover:text-primary-container transition-colors">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-grow pt-16 flex flex-col">
+<!-- Hero Section -->
+<section class="relative min-h-[80vh] flex items-center justify-center overflow-hidden bg-surface-lowest seismic-grid-bg">
+<!-- Decorative Background Element -->
+<div class="absolute inset-0 z-0 flex items-center justify-center opacity-30 pointer-events-none">
+<svg class="w-full max-w-5xl text-primary" preserveaspectratio="none" viewbox="0 0 800 200">
+<path class="animate-[dash_5s_linear_infinite]" d="M0,100 L100,100 L120,50 L140,150 L160,20 L180,180 L200,80 L220,120 L240,100 L800,100" fill="none" stroke="currentColor" stroke-dasharray="10, 10" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<div class="relative z-10 max-w-container-max-width mx-auto px-margin w-full text-center glow-effect">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-outline-variant bg-surface-container-low mb-6">
+<span class="w-2 h-2 rounded-full bg-error animate-pulse"></span>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Live Monitoring Active</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg md:text-[56px] md:leading-[64px] font-bold text-on-surface mb-4 tracking-tight">
+                    Earthquake Intelligence <span class="text-primary">Dashboard</span>
+</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto mb-10">
+                    Real-time tracking and analytics built on official USGS seismic data. Advanced monitoring tools designed for geologists, researchers, and emergency response teams.
+                </p>
+<a class="inline-flex items-center justify-center gap-2 px-8 py-4 bg-primary text-on-primary-fixed font-headline-md text-[18px] font-bold rounded hover:bg-primary-container transition-all duration-300 shadow-[0_0_15px_rgba(255,179,0,0.3)] hover:shadow-[0_0_25px_rgba(255,179,0,0.5)] transform hover:-translate-y-1" href="dashboard.html">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+                    View Live Dashboard
+                </a>
+</div>
+</section>
+<!-- Feature Grid Section -->
+<section class="py-24 bg-surface px-margin">
+<div class="max-w-container-max-width mx-auto">
+<div class="text-center mb-16">
+<h2 class="font-headline-md text-headline-md text-on-surface mb-2">Technical Capabilities</h2>
+<div class="w-12 h-1 bg-primary mx-auto opacity-50"></div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
+<!-- Feature 1 -->
+<div class="glass-panel p-card-padding rounded-lg group hover:border-primary transition-colors duration-300 flex flex-col h-full">
+<div class="w-12 h-12 rounded bg-surface-container-high flex items-center justify-center text-primary mb-4 border border-outline-variant group-hover:border-primary/50 transition-colors">
+<span class="material-symbols-outlined">update</span>
+</div>
+<h3 class="font-headline-md text-[18px] text-on-surface mb-2">Hourly Updates</h3>
+<p class="font-body-md text-body-md text-on-surface-variant flex-grow">
+                            Continuous data ingestion from global sensor networks ensuring you never miss critical tectonic shifts.
+                        </p>
+<div class="mt-4 font-data-md text-data-md text-primary opacity-60 flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">sync</span> Fetching...
+                        </div>
+</div>
+<!-- Feature 2 -->
+<div class="glass-panel p-card-padding rounded-lg group hover:border-primary transition-colors duration-300 flex flex-col h-full">
+<div class="w-12 h-12 rounded bg-surface-container-high flex items-center justify-center text-primary mb-4 border border-outline-variant group-hover:border-primary/50 transition-colors">
+<span class="material-symbols-outlined">analytics</span>
+</div>
+<h3 class="font-headline-md text-[18px] text-on-surface mb-2">Depth-vs-Magnitude</h3>
+<p class="font-body-md text-body-md text-on-surface-variant flex-grow">
+                            Advanced scatter plots and correlation matrices to analyze the relationship between focal depth and energy release.
+                        </p>
+<div class="mt-4 font-data-md text-data-md text-primary opacity-60 flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">bar_chart</span> Render Ready
+                        </div>
+</div>
+<!-- Feature 3 -->
+<div class="glass-panel p-card-padding rounded-lg group hover:border-primary transition-colors duration-300 flex flex-col h-full relative overflow-hidden">
+<!-- Alert accent -->
+<div class="absolute top-0 right-0 w-16 h-16 bg-error/10 rounded-bl-full border-l border-b border-error/20 flex items-start justify-end p-2 pointer-events-none"></div>
+<div class="w-12 h-12 rounded bg-surface-container-high flex items-center justify-center text-error mb-4 border border-outline-variant group-hover:border-error/50 transition-colors">
+<span class="material-symbols-outlined">warning</span>
+</div>
+<h3 class="font-headline-md text-[18px] text-on-surface mb-2">Tsunami &amp; Alert Flags</h3>
+<p class="font-body-md text-body-md text-on-surface-variant flex-grow">
+                            Instant visual indicators for events meeting automated warning criteria, prioritizing potential coastal impacts.
+                        </p>
+<div class="mt-4 font-data-md text-data-md text-error opacity-80 flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">notifications_active</span> System Armed
+                        </div>
+</div>
+<!-- Feature 4 -->
+<div class="glass-panel p-card-padding rounded-lg group hover:border-primary transition-colors duration-300 flex flex-col h-full">
+<div class="w-12 h-12 rounded bg-surface-container-high flex items-center justify-center text-primary mb-4 border border-outline-variant group-hover:border-primary/50 transition-colors">
+<span class="material-symbols-outlined">filter_alt</span>
+</div>
+<h3 class="font-headline-md text-[18px] text-on-surface mb-2">Global Filtering</h3>
+<p class="font-body-md text-body-md text-on-surface-variant flex-grow">
+                            Isolate activity by geographic bounding box, magnitude threshold, temporal window, or specific sensor array.
+                        </p>
+<div class="mt-4 font-data-md text-data-md text-primary opacity-60 flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">settings_overscan</span> Parametric Control
+                        </div>
+</div>
+</div>
+</div>
+</section>
+<!-- Data Teaser Section (Bento Style) -->
+<section class="py-16 bg-surface-container-lowest px-margin border-t border-outline-variant/30">
+<div class="max-w-container-max-width mx-auto">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter h-auto lg:h-[400px]">
+<!-- Large Data Viz Panel -->
+<div class="lg:col-span-2 glass-panel rounded-lg p-card-padding relative overflow-hidden flex flex-col">
+<div class="flex justify-between items-center border-b border-outline-variant/50 pb-2 mb-4">
+<h3 class="font-label-sm text-label-sm text-primary uppercase">Recent Global Activity Plot</h3>
+<span class="font-data-md text-[12px] text-on-surface-variant">LIVE</span>
+</div>
+<div class="flex-grow bg-surface-container-low rounded border border-outline-variant/30 relative overflow-hidden p-4">
+<canvas id="landingSparkline"></canvas>
+</div>
+</div>
+<!-- Quick Stats Panel -->
+<div class="glass-panel rounded-lg p-card-padding flex flex-col">
+<div class="border-b border-outline-variant/50 pb-2 mb-4">
+<h3 class="font-label-sm text-label-sm text-primary uppercase">Live Snapshot</h3>
+</div>
+<div class="flex flex-col gap-4 flex-grow">
+<div class="bg-surface-container-low p-3 rounded border border-outline-variant/30 flex justify-between items-center">
+<span class="font-data-md text-on-surface-variant">Total Events</span>
+<span class="font-data-md text-tertiary" id="landing-total">--</span>
+</div>
+<div class="bg-surface-container-low p-3 rounded border border-outline-variant/30 flex justify-between items-center">
+<span class="font-data-md text-on-surface-variant">Peak Magnitude</span>
+<span class="font-data-md text-primary" id="landing-strongest">--</span>
+</div>
+<div class="bg-surface-container-low p-3 rounded border border-error/30 flex justify-between items-center shadow-[inset_0_0_10px_rgba(255,82,82,0.1)]">
+<span class="font-data-md text-error">Tsunami Flagged</span>
+<span class="font-data-md text-error font-bold" id="landing-tsunami">--</span>
+</div>
+</div>
+<a class="mt-4 w-full block text-center py-2 bg-transparent border border-primary text-primary font-label-sm text-label-sm rounded hover:bg-primary/10 transition-colors uppercase tracking-wider" href="dashboard.html">
+                            View Full Metrics
+                        </a>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Bottom interactive section -->
+<section class="w-full max-w-container-max-width mx-auto px-margin pb-24">
+<div class="glass-panel rounded-lg p-card-padding">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+<div>
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface">Explore Magnitude Trends</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Every tracked earthquake, grouped by strength — hover any bar to inspect it.</p>
+</div>
+<a class="inline-flex items-center gap-2 px-6 py-3 bg-primary text-on-primary-fixed font-label-md text-label-md font-bold rounded hover:bg-primary-container transition-colors whitespace-nowrap shadow-[0_0_15px_rgba(255,179,0,0.25)]" href="dashboard.html">
+<span class="material-symbols-outlined text-[18px]">open_in_new</span>
+                        Open Full Dashboard
+                    </a>
+</div>
+<div class="h-[280px]">
+<canvas id="landingMagnitudeChart"></canvas>
+</div>
+</div>
+</section>
+<!-- /Bottom interactive section -->
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest w-full py-8 mt-auto border-t border-outline-variant/30">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin max-w-container-max-width mx-auto gap-4">
+<div class="font-label-sm text-label-sm font-bold text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">sensors</span>
+                Seismic Pulse
+            </div>
+<nav class="flex gap-6">
+<a class="text-on-surface-variant font-body-md text-body-md hover:text-primary underline transition-all duration-200" href="#">API Documentation</a>
+<a class="text-on-surface-variant font-body-md text-body-md hover:text-primary underline transition-all duration-200" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant font-body-md text-body-md hover:text-primary underline transition-all duration-200" href="#">Emergency Protocols</a>
+</nav>
+<div class="text-on-surface-variant font-body-md text-body-md text-sm text-center md:text-right">
+                © 2024 Seismic Pulse. Data sourced from USGS.<br/>
+<span class="font-data-md text-[12px] opacity-70">Last snapshot: <span id="footer-updated">--</span></span>
+</div>
+</div>
+</footer>
+<script src="script.js"></script>
+</body></html>
